@@ -1,0 +1,68 @@
+package com.company.ThreadTasks;
+
+
+
+import com.company.gui.SimpleGUI;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class ThreadMonitor extends ThreadedTask {
+
+    private static Map<ThreadedTask, String> runningThreads = new HashMap<>();
+
+    private static Map<ThreadedTask, String> newThreads = new HashMap<>();
+
+    public ThreadMonitor() {
+        super("ThreadMonitor");
+        this.setDaemon(true);
+    }
+
+    @Override
+    public void run() {
+        StringBuffer text = new StringBuffer();
+        while(!Thread.interrupted()) {
+            text.append("Threads in Queue:\n");
+            synchronized (newThreads) {
+                newThreads.values().forEach(t -> text.append(t).append('\n'));
+            }
+            text.append("Running threads:\n");
+            synchronized (runningThreads) {
+                runningThreads.values().forEach(t -> text.append(t).append('\n'));
+            }
+            SimpleGUI.setText(text.toString());
+            text.delete(0, text.length());
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void addInNewThread(ThreadedTask threadedTask) {
+        synchronized (newThreads) {
+            newThreads.put(threadedTask, threadedTask.toString());
+        }
+    }
+
+    public void addInRunnableThread(ThreadedTask threadedTask) {
+        synchronized (newThreads) {
+            if(newThreads.containsKey(threadedTask)) {
+                newThreads.remove(threadedTask);
+            }
+        }
+        synchronized (runningThreads) {
+            runningThreads.put(threadedTask, threadedTask.toString());
+        }
+    }
+
+    public void removeThread(ThreadedTask threadedTask) {
+        synchronized (runningThreads) {
+            if(runningThreads.containsKey(threadedTask)) {
+                runningThreads.remove(threadedTask);
+            }
+        }
+    }
+
+}
