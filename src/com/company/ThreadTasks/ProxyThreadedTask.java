@@ -1,8 +1,6 @@
 package com.company.ThreadTasks;
 
 import com.company.ThreadDispatcher;
-import com.company.ThreadTasks.ThreadedTask;
-
 
 public class ProxyThreadedTask extends ThreadedTask
 {
@@ -13,7 +11,6 @@ public class ProxyThreadedTask extends ThreadedTask
         this.threadedTask = threadedTask;
         name = threadedTask.name;
     }
-
 
     @Override
     public void run()

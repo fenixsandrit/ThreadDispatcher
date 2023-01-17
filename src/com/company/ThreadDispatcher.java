@@ -11,10 +11,10 @@ public class ThreadDispatcher
 
     private static volatile Queue<ThreadedTask> globalQueue;
     private static volatile ThreadDispatcher instance;
-
     private static volatile ThreadMonitor threadMonitor;
     private static final Object syncObject = new Object();
     private static int poolSize;
+    private static volatile int activeThreadWorkerCount;
 
     private ThreadDispatcher()
     {
@@ -36,17 +36,21 @@ public class ThreadDispatcher
 
     public static boolean canPeek()
     {
-        return !globalQueue.isEmpty();
+        return !globalQueue.isEmpty() && activeThreadWorkerCount < poolSize;
     }
 
     public void add(ThreadedTask task)
     {
-        (new ProxyThreadedTask(task)).start();
+        ProxyThreadedTask proxyThreadedTask = new ProxyThreadedTask(task);
+
+        threadMonitor.addInNewThread(proxyThreadedTask);
+        proxyThreadedTask.start();
     }
 
     public void addInQueue(ThreadedTask task)
     {
         ProxyThreadedTask proxyThreadedTask = new ProxyThreadedTask(task);
+
         threadMonitor.addInNewThread(proxyThreadedTask);
         synchronized (syncObject)
         {
@@ -71,8 +75,18 @@ public class ThreadDispatcher
 
     public static ThreadedTask getTaskWithRemoval()
     {
-        var task = globalQueue.poll();
-        return task;
+        increaseActiveThreadWorkerCount();
+        return globalQueue.poll();
+    }
+
+    public static void increaseActiveThreadWorkerCount()
+    {
+        activeThreadWorkerCount++;
+    }
+
+    public static void decreaseActiveThreadWorkerCount()
+    {
+        activeThreadWorkerCount--;
     }
 
     public static void threadWasStarted(ThreadedTask task)

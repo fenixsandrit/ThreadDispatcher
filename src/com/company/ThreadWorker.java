@@ -35,11 +35,27 @@ public class ThreadWorker extends Thread
                 try
                 {
                     task.join();
+                    synchronized (ThreadDispatcher.getSyncObject())
+                    {
+                        ThreadDispatcher.decreaseActiveThreadWorkerCount();
+                        ThreadDispatcher.getSyncObject().notifyAll();
+                    }
                 } catch (InterruptedException e)
                 {
                     throw new RuntimeException(e);
                 }
                 task = null;
+            }
+            else
+            {
+                synchronized (ThreadDispatcher.getSyncObject())
+                {
+                    try {
+                        ThreadDispatcher.getSyncObject().wait();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
 
         }

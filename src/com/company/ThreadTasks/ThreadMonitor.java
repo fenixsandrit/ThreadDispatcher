@@ -9,7 +9,9 @@ import java.util.Map;
 
 public class ThreadMonitor extends ThreadedTask
 {
-
+    public static final String THREADS_IN_QUEUE = "THREADS_IN_QUEUE";
+    public static final String RUNNING_THREADS = "RUNNING_THREADS";
+    public static final String TEXT_SEPARATOR = "---------------------------------------------------------------------";
     private static Map<ThreadedTask, String> runningThreads = new HashMap<>();
 
     private static Map<ThreadedTask, String> newThreads = new HashMap<>();
@@ -27,13 +29,13 @@ public class ThreadMonitor extends ThreadedTask
 
         while(!Thread.interrupted())
         {
-            text.append("Threads in Queue:\n");
+            text.append(THREADS_IN_QUEUE).append(":\n").append(TEXT_SEPARATOR).append("\n");
             synchronized (newThreads)
             {
                 newThreads.values().forEach(t -> text.append(t).append('\n'));
             }
 
-            text.append("Running threads:\n");
+            text.append(RUNNING_THREADS).append(":\n").append(TEXT_SEPARATOR).append("\n");
             synchronized (runningThreads)
             {
                 runningThreads.values().forEach(t -> text.append(t).append('\n'));
@@ -44,7 +46,7 @@ public class ThreadMonitor extends ThreadedTask
 
             try
             {
-                sleep(1000);
+                sleep(700);
             } catch (InterruptedException e)
             {
                 throw new RuntimeException(e);

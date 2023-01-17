@@ -13,13 +13,13 @@ public class SortingTask extends ThreadedTask {
     @Override
     public void run()
     {
-        int sum = 0;
-        List<Integer> list = new ArrayList<>();
-        for (int i = 0; i <9999999; i++)
+        List<Integer> listToSort = new ArrayList<>();
+
+        for (int i = 0; i < 9999999; i++)
         {
-            list.add((int) Math.random()*100000);
+            listToSort.add((int) (Math.random() * 100000));
         }
 
-        Collections.sort(list);
+        Collections.sort(listToSort);
     }
 }

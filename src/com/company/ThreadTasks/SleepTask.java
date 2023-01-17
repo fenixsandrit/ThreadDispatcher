@@ -1,6 +1,5 @@
 package com.company.ThreadTasks;
 
-
 public class SleepTask extends ThreadedTask
 {
     public SleepTask()
@@ -12,7 +11,7 @@ public class SleepTask extends ThreadedTask
     {
         try
         {
-            Thread.sleep(2000);
+            Thread.sleep(3000);
         } catch (InterruptedException e)
         {
             e.printStackTrace();
